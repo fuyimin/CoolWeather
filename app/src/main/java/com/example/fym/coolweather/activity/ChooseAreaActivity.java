@@ -3,6 +3,8 @@ package com.example.fym.coolweather.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -85,6 +87,7 @@ public class ChooseAreaActivity extends Activity{
             listView.setSelection(0);
             textView.setText("中国");
             Current_level=PROVINCE_LEVEL;
+            Log.d("ChooseAreaActivity",dataList.toString());
         }else{
             queryFromServer(null,"Province");
         }
@@ -127,13 +130,13 @@ public class ChooseAreaActivity extends Activity{
     }
 
     //从服务器查询数据并写进数据库，传入code和type
-    public void queryFromServer(String code, final String type){
+    public void queryFromServer(final String code, final String type){
         String address;
 
-        if (type.equals("Province")){
-            address="http://www.weather.com.cn/data/list3/city.xml";
-        }else{
+        if (!TextUtils.isEmpty(code)){
             address="http://www.weather.com.cn/data/list3/city"+code+".xml";
+        }else{
+            address="http://www.weather.com.cn/data/list3/city.xml";
         }
         showProgressDialog();
         HttpUtil.setHttpRequest(address, new HttpCallBackListener() {
@@ -142,10 +145,11 @@ public class ChooseAreaActivity extends Activity{
                 boolean result=false;
                 if (type.equals("Province")){
                     result= Utility.handleProvinceResponse(coolWeatherDB,response);
+                    Log.d("ChooseAreaActivity","true");
                 }else if (type.equals("City")){
-                    result=Utility.handleCityResponse(coolWeatherDB,response);
+                    result=Utility.handleCityResponse(coolWeatherDB,response,selectedProvince.getId());
                 }else if (type.equals("County")){
-                    result=Utility.handleCountyResponse(coolWeatherDB,response);
+                    result=Utility.handleCountyResponse(coolWeatherDB,response,selectedCity.getId());
                 }
 
                 if (result){
@@ -160,6 +164,7 @@ public class ChooseAreaActivity extends Activity{
                             }else if (type.equals("County")){
                                 queryCounties();
                             }
+                            closeProgressDialog();
                         }
                     });
                 }
@@ -188,16 +193,22 @@ public class ChooseAreaActivity extends Activity{
         progressDialog.show();
     }
 
+    //消除进度对话框
+    public  void closeProgressDialog(){
+        if (progressDialog!=null){
+            progressDialog.dismiss();
+        }
+    }
+
     //捕获back键，根据当前级别来判断，此刻应该返回什么列表
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         if (Current_level==PROVINCE_LEVEL){
              System.exit(0);
         }else if (Current_level==CITY_LEVEL){
             queryProvinces();
         }else if (Current_level==COUNTY_LEVEL){
-            queryCounties();
+            queryCities();
         }
     }
 }

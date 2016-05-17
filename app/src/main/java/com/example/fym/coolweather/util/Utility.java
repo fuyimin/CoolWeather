@@ -33,7 +33,7 @@ public class Utility {
    }
 
     //解析服务器返回的市级数据
-    public  static boolean handleCityResponse(CoolWeatherDB coolWeatherDB,String response){
+    public  static boolean handleCityResponse(CoolWeatherDB coolWeatherDB,String response,int provinceId){
         if (!TextUtils.isEmpty(response)){
             String[] codeAndCity=response.split(",");
             if (codeAndCity.length>0){
@@ -42,6 +42,7 @@ public class Utility {
                     City city=new City();
                     city.setCityCode(arrays[0]);
                     city.setCityName(arrays[1]);
+                    city.setProvinceId(provinceId);
                     coolWeatherDB.saveCity(city);
                 }
                 return  true;
@@ -51,7 +52,7 @@ public class Utility {
     }
 
     //解析服务器返回的县级数据
-    public  static boolean handleCountyResponse(CoolWeatherDB coolWeatherDB,String response){
+    public  static boolean handleCountyResponse(CoolWeatherDB coolWeatherDB,String response,int cityId){
 
         if (!TextUtils.isEmpty(response)){
             String[] codeAndCounty=response.split(",");
@@ -61,6 +62,7 @@ public class Utility {
                     County county=new County();
                     county.setCountyCode(arrays[0]);
                     county.setCountyName(arrays[1]);
+                    county.setCityId(cityId);
                     coolWeatherDB.saveCounty(county);
                 }
                 return true;

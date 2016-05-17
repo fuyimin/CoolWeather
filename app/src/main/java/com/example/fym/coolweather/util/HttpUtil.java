@@ -1,11 +1,12 @@
 package com.example.fym.coolweather.util;
 
+
+import android.util.Log;
+
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -22,13 +23,12 @@ public class HttpUtil {
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
+                    connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
                     StringBuffer sb = new StringBuffer();
-                    String line = null;
-                    while (reader.readLine() != null) {
-                        line = reader.readLine();
+                    String line;
+                    while ((line=reader.readLine() )!= null) {
                         sb.append(line);
                     }
                     if (httpCallBackListener != null) {
@@ -36,7 +36,9 @@ public class HttpUtil {
                     }
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     httpCallBackListener.onError(e);
+
                 } finally {
                     if (connection != null) {
                         connection.disconnect();
