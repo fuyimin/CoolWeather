@@ -1,5 +1,9 @@
 package com.example.fym.coolweather.util;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.example.fym.coolweather.db.CoolWeatherDB;
@@ -7,8 +11,15 @@ import com.example.fym.coolweather.model.City;
 import com.example.fym.coolweather.model.County;
 import com.example.fym.coolweather.model.Province;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Administrator on 2016/5/16 0016.
@@ -70,5 +81,37 @@ public class Utility {
         }
 
         return  false;
+    }
+
+    //解析服务器返回的json格式的天气信息,然后用SharedPreference存储
+    public static boolean handleWeatherResponse(Context context,String response){
+        try {
+            if (!TextUtils.isEmpty(response)){
+                JSONObject jsonObject=new JSONObject(response);
+                JSONObject weatherInfo=jsonObject.getJSONObject("weatherinfo");
+                String cityName=weatherInfo.getString("city");
+                String  cityId=weatherInfo.getString("cityid");
+                String temp1=weatherInfo.getString("temp1");
+                String temp2=weatherInfo.getString("temp2");
+                String weather=weatherInfo.getString("weather");
+                String publishTime=weatherInfo.getString("ptime");
+
+                SimpleDateFormat sdf=new SimpleDateFormat("yyyy年mm月dd日", Locale.CHINA);
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(context).edit();
+                editor.putString("cityName",cityName);
+                editor.putString("cityCode",cityId);
+                editor.putString("temp1",temp1);
+                editor.putString("temp2",temp2);
+                editor.putString("weatherDesc",weather);
+                editor.putString("pTime",publishTime);
+                editor.putString("data",sdf.format(new Date()));
+                editor.commit();
+
+                return  true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

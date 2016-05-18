@@ -2,6 +2,7 @@ package com.example.fym.coolweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.fym.coolweather.R;
 import com.example.fym.coolweather.db.CoolWeatherDB;
 import com.example.fym.coolweather.model.City;
@@ -21,7 +21,6 @@ import com.example.fym.coolweather.model.Province;
 import com.example.fym.coolweather.util.HttpCallBackListener;
 import com.example.fym.coolweather.util.HttpUtil;
 import com.example.fym.coolweather.util.Utility;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +39,6 @@ public class ChooseAreaActivity extends Activity{
        private  ProgressDialog progressDialog;
        //存储临时数据
        private List<String> dataList=new ArrayList<>();
-
        private List<Province> provinceList;
        private List<City> cityList;
        private  List<County> countyList;
@@ -68,6 +66,13 @@ public class ChooseAreaActivity extends Activity{
                      }else if (Current_level==CITY_LEVEL){
                          selectedCity=cityList.get(position);
                          queryCounties();
+                     }else if (Current_level==COUNTY_LEVEL){
+                         String countyCode=countyList.get(position).getCountyCode();
+                         Intent intent=new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                         intent.putExtra("countyCode",countyCode);
+
+                         startActivity(intent);
+                         finish();
                      }
             }
         });
@@ -87,7 +92,7 @@ public class ChooseAreaActivity extends Activity{
             listView.setSelection(0);
             textView.setText("中国");
             Current_level=PROVINCE_LEVEL;
-            Log.d("ChooseAreaActivity",dataList.toString());
+
         }else{
             queryFromServer(null,"Province");
         }
