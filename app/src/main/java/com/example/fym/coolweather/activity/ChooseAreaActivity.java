@@ -45,7 +45,7 @@ public class ChooseAreaActivity extends Activity{
        private  Province selectedProvince;
        private  City selectedCity;
        private int Current_level;
-
+       private  boolean isfromWeatherActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +53,7 @@ public class ChooseAreaActivity extends Activity{
         setContentView(R.layout.choose_area);
         textView=(TextView)findViewById(R.id.title_text);
         listView=(ListView)findViewById(R.id.list_view);
+        isfromWeatherActivity=getIntent().getBooleanExtra("is_from_weatherActivity",false);
         adapter=new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,dataList);
         coolWeatherDB=CoolWeatherDB.getInstance(this);
         listView.setAdapter(adapter);
@@ -60,23 +61,28 @@ public class ChooseAreaActivity extends Activity{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                     if (Current_level==PROVINCE_LEVEL){
-                         selectedProvince=provinceList.get(position);
-                         queryCities();
-                     }else if (Current_level==CITY_LEVEL){
-                         selectedCity=cityList.get(position);
-                         queryCounties();
-                     }else if (Current_level==COUNTY_LEVEL){
-                         String countyCode=countyList.get(position).getCountyCode();
-                         Intent intent=new Intent(ChooseAreaActivity.this,WeatherActivity.class);
-                         intent.putExtra("countyCode",countyCode);
+                if (Current_level == PROVINCE_LEVEL) {
+                    selectedProvince = provinceList.get(position);
+                    queryCities();
+                } else if (Current_level == CITY_LEVEL) {
+                    selectedCity = cityList.get(position);
+                    queryCounties();
+                } else if (Current_level == COUNTY_LEVEL) {
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("countyCode", countyCode);
+                    startActivity(intent);
 
-                         startActivity(intent);
-                         finish();
-                     }
+                }
             }
         });
-        queryProvinces();
+
+        if (!isfromWeatherActivity){
+            queryProvinces();
+        }else{
+            Log.d("selectedCity",selectedCity.toString());
+        }
+
     }
 
     //优先从数据库中查询，如果没有再到服务器上查询
