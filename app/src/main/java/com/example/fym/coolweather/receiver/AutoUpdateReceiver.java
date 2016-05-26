@@ -13,6 +13,6 @@ public class AutoUpdateReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent i=new Intent(context, UpdateWeatheService.class);
-        context.startActivity(i);
+        context.startService(i);
     }
 }

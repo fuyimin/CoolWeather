@@ -156,7 +156,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         weatherInfoLayout.setVisibility(View.VISIBLE);
 
         Intent intent=new Intent(this, UpdateWeatheService.class);
-        startActivity(intent);
+        startService(intent);
     }
 
 
